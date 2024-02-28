@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Todo List</string>
+    <string name="editTextNote">Введите текст :</string>
+    <string name="low">низкий</string>
+    <string name="medium">средний</string>
+    <string name="high">высокий</string>
+    <string name="save">Save</string>
 </resources>

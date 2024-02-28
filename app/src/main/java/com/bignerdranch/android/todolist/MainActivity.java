@@ -1,5 +1,6 @@
 package com.bignerdranch.android.todolist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -10,15 +11,12 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public class MainActivity extends AppCompatActivity {
 
     LinearLayout linearLayoutNotes;
     FloatingActionButton floatingActionButton;
 
-    private ArrayList<Note> notes = new ArrayList<>();
+    private DataBase dataBase = DataBase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +24,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
-        simulationOfRandomNotes();
+        onClickAddNotes();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
         showNotes();
     }
 
@@ -35,16 +38,9 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton = findViewById(R.id.floatingActionButton);
     }
 
-    private void simulationOfRandomNotes() {
-        Random random = new Random();
-        for (int i = 0; i < 20; i++) {
-            Note note = new Note(i, "заметка" + i, random.nextInt(3));//генерирует от 0-3 случ число включ
-            notes.add(note);
-        }
-    }
-
     private void showNotes() {
-        for (Note note : notes) {
+        linearLayoutNotes.removeAllViews();
+        for (Note note : dataBase.getNotes()) {
             View view = getLayoutInflater().inflate(
                     R.layout.note_item,
                     linearLayoutNotes,
@@ -54,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             textViewNote.setText(note.getText());
 
             int colorResId;
-            switch (note.getId()) {
+            switch (note.getPriority()) {
                 case 0:
                     colorResId = android.R.color.holo_green_light;
                     break;
@@ -69,5 +65,15 @@ public class MainActivity extends AppCompatActivity {
             textViewNote.setBackgroundColor(color);
             linearLayoutNotes.addView(view);
         }
+    }
+
+    private void onClickAddNotes() {
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = AddNoteActivity.newIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
     }
 }
