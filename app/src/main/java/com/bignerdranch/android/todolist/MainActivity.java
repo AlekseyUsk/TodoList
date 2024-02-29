@@ -3,11 +3,10 @@ package com.bignerdranch.android.todolist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
     private Adapter adapterNotes;
+    private ItemTouchHelper itemTouchHelper;
 
     private DataBase dataBase = DataBase.getInstance();
 
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initRecyclerView();
         onClickAddNotes();
-        onClickItemViewToAdapter();
+        setupSwipeListener();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapterNotes);
     }
 
-    private void onClickItemViewToAdapter() {
+    private void DeletingByClickingOnAnElementInTheAdapter() {
         adapterNotes.setOnNoteClickListener(new Adapter.OnNoteClickListener() {
             @Override
             public void onNoteClick(Note note) {
@@ -55,6 +55,29 @@ public class MainActivity extends AppCompatActivity {
                 showNotes();
             }
         });
+    }
+
+    private void setupSwipeListener() {
+        itemTouchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback
+                        (0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();    //получил из адаптера номер позиции
+                Note note = adapterNotes.getNotes().get(position);// получили обьект по которому произвед свайп
+                dataBase.remove(note.getId());                   //удалил
+                showNotes();                                    //обновил
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void showNotes() {

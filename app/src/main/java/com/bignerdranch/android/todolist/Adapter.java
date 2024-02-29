@@ -25,6 +25,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolderNote> {
         notifyDataSetChanged();
     }
 
+    public ArrayList<Note> getNotes() {
+        return new ArrayList<>(notes);
+    }
+
     @Override
     public ViewHolderNote onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
