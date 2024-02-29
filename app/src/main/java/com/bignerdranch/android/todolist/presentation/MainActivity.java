@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewModel = new ViewModel(getApplication());
+        viewModel = new ViewModelProvider(this).get(ViewModel.class);
 
         initView();
         initRecyclerView();
@@ -41,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         onClickAddNotes();
         setupSwipeListener();
     }
-    private void subscribingToChangesLiveDataTransferOfTheAdapter(){
+
+    private void subscribingToChangesLiveDataTransferOfTheAdapter() {
         viewModel.getNotes().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
@@ -73,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction)
-                    {
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         Note note = adapterNotes.getNotes().get(position);
                         viewModel.remove(note);

@@ -12,9 +12,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bignerdranch.android.todolist.Room.Note;
 import com.bignerdranch.android.todolist.Room.NoteDataBase;
+import com.bignerdranch.android.todolist.presentation.viewmodel.AddNoteActivityViewModel;
+import com.bignerdranch.android.todolist.presentation.viewmodel.ViewModel;
 
 public class AddNoteActivity extends AppCompatActivity {
 
@@ -25,17 +29,16 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioBtnHigh;
     private Button btnSve;
 
-    private NoteDataBase noteDataBase;
-    private Handler handler;
+    private AddNoteActivityViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
-        noteDataBase = NoteDataBase.getInstance(getApplication());
-        handler = new Handler(Looper.getMainLooper());
+        viewModel = new ViewModelProvider(this).get(AddNoteActivityViewModel.class);
 
+        closeScreen();
         initView();
         onClickSaveNote();
     }
@@ -56,19 +59,18 @@ public class AddNoteActivity extends AppCompatActivity {
                 String text = editTextNote.getText().toString().trim();
                 int priority = getPriority();
                 Note note = new Note(0, text, priority);
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        noteDataBase.noteDAO().addNote(note);
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                finish();
-                            }
-                        });
-                    }
-                });
-                thread.start();
+                viewModel.saveNote(note);
+            }
+        });
+    }
+
+    private void closeScreen(){
+        viewModel.getShouldCloseScreen().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean shouldClose) {
+                if (shouldClose) {
+                    finish();
+                }
             }
         });
     }
