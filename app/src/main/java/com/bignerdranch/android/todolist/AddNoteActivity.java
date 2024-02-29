@@ -12,22 +12,25 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bignerdranch.android.todolist.Room.Note;
+import com.bignerdranch.android.todolist.Room.NoteDataBase;
 
 public class AddNoteActivity extends AppCompatActivity {
 
-    private DataBase dataBase = DataBase.getInstance();
+    private TextView editTextNote;
+    private RadioGroup radioGroupNote;
+    private RadioButton radioBtnLow;
+    private RadioButton radioBtnMedium;
+    private RadioButton radioBtnHigh;
+    private Button btnSve;
 
-    TextView editTextNote;
-    RadioGroup radioGroupNote;
-    RadioButton radioBtnLow;
-    RadioButton radioBtnMedium;
-    RadioButton radioBtnHigh;
-    Button btnSve;
+    private NoteDataBase noteDataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+
+        noteDataBase = NoteDataBase.getInstance(getApplication());
 
         initView();
         onClickSaveNote();
@@ -48,9 +51,8 @@ public class AddNoteActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String text = editTextNote.getText().toString().trim();
                 int priority = getPriority();
-                int id = dataBase.getNotes().size();
-                Note note = new Note(id, text, priority);
-                dataBase.add(note);
+                Note note = new Note(0, text, priority);
+                noteDataBase.noteDAO().addNote(note);
 
                 finish();
             }

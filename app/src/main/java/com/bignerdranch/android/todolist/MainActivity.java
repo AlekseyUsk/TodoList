@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bignerdranch.android.todolist.Room.Note;
+import com.bignerdranch.android.todolist.Room.NoteDataBase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,17 +20,21 @@ public class MainActivity extends AppCompatActivity {
     private Adapter adapterNotes;
     private ItemTouchHelper itemTouchHelper;
 
-    private DataBase dataBase = DataBase.getInstance();
+    private NoteDataBase noteDataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        noteDataBase = NoteDataBase.getInstance(getApplication());
+
         initView();
         initRecyclerView();
         onClickAddNotes();
         setupSwipeListener();
+
+
     }
 
     @Override
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         adapterNotes.setOnNoteClickListener(new Adapter.OnNoteClickListener() {
             @Override
             public void onNoteClick(Note note) {
-                dataBase.remove(note.getId());
+                noteDataBase.noteDAO().removeNote(note.getId());
                 showNotes();
             }
         });
@@ -61,28 +66,28 @@ public class MainActivity extends AppCompatActivity {
     private void setupSwipeListener() {
         itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback
-                        (0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                        (0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView,
+                                          @NonNull RecyclerView.ViewHolder viewHolder,
+                                          @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                Note note = adapterNotes.getNotes().get(position);
-                dataBase.remove(note.getId());
-                showNotes();
-            }
-        });
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        int position = viewHolder.getAdapterPosition();
+                        Note note = adapterNotes.getNotes().get(position);
+                        noteDataBase.noteDAO().removeNote(note.getId());
+                        showNotes();
+                    }
+                });
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void showNotes() {
-        adapterNotes.setNotes(dataBase.getNotes());
+        adapterNotes.setNotes(noteDataBase.noteDAO().getNote());
     }
 
     private void onClickAddNotes() {
