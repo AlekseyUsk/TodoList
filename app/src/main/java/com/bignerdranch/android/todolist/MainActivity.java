@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bignerdranch.android.todolist.Room.Note;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -71,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();    //получил из адаптера номер позиции
-                Note note = adapterNotes.getNotes().get(position);// получили обьект по которому произвед свайп
-                dataBase.remove(note.getId());                   //удалил
-                showNotes();                                    //обновил
+                int position = viewHolder.getAdapterPosition();
+                Note note = adapterNotes.getNotes().get(position);
+                dataBase.remove(note.getId());
+                showNotes();
             }
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);

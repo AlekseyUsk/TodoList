@@ -1,7 +1,12 @@
-package com.bignerdranch.android.todolist;
+package com.bignerdranch.android.todolist.Room;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "note")
 public class Note {
 
+    @PrimaryKey(autoGenerate = true)
     private int id;
     private String text;
     private int priority;

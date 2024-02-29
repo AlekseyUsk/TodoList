@@ -1,5 +1,7 @@
 package com.bignerdranch.android.todolist;
 
+import com.bignerdranch.android.todolist.Room.Note;
+
 import java.util.ArrayList;
 import java.util.Random;
 

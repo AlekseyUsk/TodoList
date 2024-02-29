@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bignerdranch.android.todolist.Room.Note;
+
 public class AddNoteActivity extends AppCompatActivity {
 
     private DataBase dataBase = DataBase.getInstance();
