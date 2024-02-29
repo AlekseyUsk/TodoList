@@ -34,9 +34,9 @@ public class DataBase {
 
     public void remove(int id) {
         for (int i = 0; i < notes.size(); i++) {
-            Note note = notes.get(id);
+            Note note = notes.get(i);
             if (note.getId() == id) {
-                notes.remove(i);
+                notes.remove(note);
             }
         }
     }
