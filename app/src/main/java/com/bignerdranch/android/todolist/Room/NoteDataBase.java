@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = Note.class, version = 1)
+@Database(entities = {Note.class}, version = 1)
 public abstract class NoteDataBase extends RoomDatabase {
     /**Паттерн СИНГЛТОН который вернет экземпляр базы данных*/
 
@@ -23,4 +23,6 @@ public abstract class NoteDataBase extends RoomDatabase {
         }
         return instance;
     }
+
+    public abstract NoteDAO noteDAO();
 }
