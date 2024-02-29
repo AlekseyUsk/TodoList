@@ -3,6 +3,8 @@ package com.bignerdranch.android.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -24,6 +26,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private Button btnSve;
 
     private NoteDataBase noteDataBase;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class AddNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_note);
 
         noteDataBase = NoteDataBase.getInstance(getApplication());
+        handler = new Handler(Looper.getMainLooper());
 
         initView();
         onClickSaveNote();
@@ -52,9 +56,19 @@ public class AddNoteActivity extends AppCompatActivity {
                 String text = editTextNote.getText().toString().trim();
                 int priority = getPriority();
                 Note note = new Note(0, text, priority);
-                noteDataBase.noteDAO().addNote(note);
-
-                finish();
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        noteDataBase.noteDAO().addNote(note);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        });
+                    }
+                });
+                thread.start();
             }
         });
     }
