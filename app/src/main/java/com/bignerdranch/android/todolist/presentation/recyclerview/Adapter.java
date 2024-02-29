@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist;
+package com.bignerdranch.android.todolist.presentation.recyclerview;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bignerdranch.android.todolist.R;
 import com.bignerdranch.android.todolist.Room.Note;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.bignerdranch.android.todolist;
+package com.bignerdranch.android.todolist.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,11 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bignerdranch.android.todolist.AddNoteActivity;
+import com.bignerdranch.android.todolist.R;
 import com.bignerdranch.android.todolist.Room.Note;
-import com.bignerdranch.android.todolist.Room.NoteDataBase;
+import com.bignerdranch.android.todolist.presentation.recyclerview.Adapter;
+import com.bignerdranch.android.todolist.presentation.viewmodel.ViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -23,14 +26,14 @@ public class MainActivity extends AppCompatActivity {
     private Adapter adapterNotes;
     private ItemTouchHelper itemTouchHelper;
 
-    private NoteDataBase noteDataBase;
+    private ViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        noteDataBase = NoteDataBase.getInstance(getApplication());
+        viewModel = new ViewModel(getApplication());
 
         initView();
         initRecyclerView();
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setupSwipeListener();
     }
     private void subscribingToChangesLiveDataTransferOfTheAdapter(){
-        noteDataBase.noteDAO().getNote().observe(this, new Observer<List<Note>>() {
+        viewModel.getNotes().observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
                 adapterNotes.setNotes(notes);
@@ -55,15 +58,6 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView() {
         adapterNotes = new Adapter();
         recyclerView.setAdapter(adapterNotes);
-    }
-
-    private void DeletingByClickingOnAnElementInTheAdapter() {
-        adapterNotes.setOnNoteClickListener(new Adapter.OnNoteClickListener() {
-            @Override
-            public void onNoteClick(Note note) {
-                noteDataBase.noteDAO().removeNote(note.getId());
-            }
-        });
     }
 
     private void setupSwipeListener() {
@@ -83,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         int position = viewHolder.getAdapterPosition();
                         Note note = adapterNotes.getNotes().get(position);
+                        viewModel.remove(note);
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerView);
