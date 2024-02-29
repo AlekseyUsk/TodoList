@@ -2,12 +2,11 @@ package com.bignerdranch.android.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private ItemTouchHelper itemTouchHelper;
 
     private NoteDataBase noteDataBase;
-    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +31,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         noteDataBase = NoteDataBase.getInstance(getApplication());
-        handler = new Handler(Looper.getMainLooper());
 
         initView();
         initRecyclerView();
+        subscribingToChangesLiveDataTransferOfTheAdapter();
         onClickAddNotes();
         setupSwipeListener();
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        showNotes();
+    private void subscribingToChangesLiveDataTransferOfTheAdapter(){
+        noteDataBase.noteDAO().getNote().observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(List<Note> notes) {
+                adapterNotes.setNotes(notes);
+            }
+        });
     }
 
     private void initView() {
@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNoteClick(Note note) {
                 noteDataBase.noteDAO().removeNote(note.getId());
-                showNotes();
             }
         });
     }
@@ -80,42 +79,13 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction)
+                    {
                         int position = viewHolder.getAdapterPosition();
                         Note note = adapterNotes.getNotes().get(position);
-
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                noteDataBase.noteDAO().removeNote(note.getId());
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showNotes();
-                                    }
-                                });
-                            }
-                        });
-                        thread.start();
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
-
-    private void showNotes() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<Note> receivedNotesFromTheDatabase = noteDataBase.noteDAO().getNote();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapterNotes.setNotes(receivedNotesFromTheDatabase);
-                    }
-                });
-            }
-        });
-        thread.start();
     }
 
     private void onClickAddNotes() {
