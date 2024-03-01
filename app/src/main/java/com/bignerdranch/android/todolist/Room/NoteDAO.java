@@ -8,6 +8,8 @@ import androidx.room.Query;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Completable;
+
 @Dao
 public interface NoteDAO {
 
@@ -15,7 +17,7 @@ public interface NoteDAO {
     LiveData<List<Note>> getNote();
 
     @Insert
-    void addNote(Note note);
+    Completable addNote(Note note);
 
     @Query("DELETE FROM notes WHERE id = :id")
     void removeNote(int id);

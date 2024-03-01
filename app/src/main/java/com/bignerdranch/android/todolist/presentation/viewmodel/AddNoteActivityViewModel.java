@@ -10,6 +10,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.bignerdranch.android.todolist.Room.Note;
 import com.bignerdranch.android.todolist.Room.NoteDataBase;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class AddNoteActivityViewModel extends AndroidViewModel {
 
     private NoteDataBase noteDataBase;
@@ -26,13 +30,14 @@ public class AddNoteActivityViewModel extends AndroidViewModel {
     }
 
     public void saveNote(Note note) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                noteDataBase.noteDAO().addNote(note);
-                shouldCloseScreen.postValue(true);
-            }
-        });
-        thread.start();
+        noteDataBase.noteDAO().addNote(note)
+                .subscribeOn(Schedulers.io())              // перекл на фоновый поток
+                .observeOn(AndroidSchedulers.mainThread()) //перекл на главный выпоняется все что внизжу в главном потоке
+                .subscribe(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        shouldCloseScreen.setValue(true);
+                    }
+                });
     }
 }
